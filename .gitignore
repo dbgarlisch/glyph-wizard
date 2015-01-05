@@ -1,0 +1,24 @@
+# Repository Specific Files
+bwidget-1.9.8/BWman/
+bwidget-1.9.8/demo/
+bwidget-1.9.8/images/
+bwidget-1.9.8/tests/
+bwidget-1.9.8/*-old*
+
+
+#############
+## Windows detritus
+#############
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Mac crap
+.DS_Store
