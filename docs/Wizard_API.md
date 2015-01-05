@@ -53,6 +53,8 @@ If *pattern* is not given, all page names are returned.
 ### **pw::Wizard page size**
 
 The **page size** command returns the number of pages added.
+<dl>
+</dl>
 <br/>
 
 
