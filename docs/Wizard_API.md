@@ -4,6 +4,8 @@
 * [The pw::Wizard Library](#the-pwwizard-library)
 * [pw::Wizard Command Docs](#pwwizard-command-docs)
 * [pw::Wizard Library Usage Example](#pwwizard-library-usage-example)
+* [Creating Pages](#creating-pages)
+* [Predefined Validators](#predefined-validators)
 * [Disclaimer](#disclaimer)
 
 
@@ -32,8 +34,9 @@ The **page add** command is used to create a wizard page object.
   <dt><em>name</em></dt>
   <dd>The page object name. Can be any valid tcl variable name.</dd>
   <dt><em>script</em></dt>
-  <dd>The tcl/Tk script that creates the widgets and page layout. This
-  script is executed by the call to **pw::Wizard run**.</dd>
+  <dd>The tcl/Tk script used to create the page widgets and layout. This script is 
+  not executed immediately. It is executed later in the call to <em>pw::Wizard run</em>. 
+  See the Creating Pages section for more details.</dd>
 </dl>
 <br/>
 
@@ -65,11 +68,11 @@ validation engine. See also [Predefined Validators](#predefined-validators).
 <dl>
   <dt><em>procName</em></dt>
   <dd>The proc called to validate a value. The proc must use the call signature
-  `{ val args }`.</dd>
+  <code>{ val args }</code>.</dd>
   <dt><em>valTypes</em></dt>
   <dd>The list of type names that use this validator proc. If empty (the
-  default), the value returned by `[namespace tail $procName]` is used. In the
-  list, *@* is shorthand for `[namespace tail $procName]`.</dd>
+  default), the value returned by <code>[namespace tail $procName]</code> is used. In the
+  list, <em>@</em> is shorthand for <code>[namespace tail $procName]</code>.</dd>
   <dt><em>allowReplace</em></dt>
   <dd>If 1, any existing value types are replaced. If 0 (the default), replacing
   an exisiting type name is an error.</dd>
@@ -99,11 +102,11 @@ This proc is equivalent to calling:
 <dl>
   <dt><em>procName</em></dt>
   <dd>The proc called to validate a value. The proc must use the call signature
-  `{ val args }`.</dd>
+  <code>{ val args }</code>.</dd>
   <dt><em>valTypes</em></dt>
   <dd>The list of type names that use this validator proc. If empty (the
-  default), the value returned by `[namespace tail $procName]` is used. In the
-  list, *@* is shorthand for `[namespace tail $procName]`.</dd>
+  default), the value returned by <code>[namespace tail $procName]</code> is used. In the
+  list, <em>@</em> is shorthand for <code>[namespace tail $procName]</code>.</dd>
 </dl>
 <br/>
 
@@ -162,7 +165,7 @@ value.
 
 ### **pw::Wizard run**
 
-The **run** starts the application and displays the wizard dialog box.
+The **run** starts the application, runs the page creation scripts, and displays the wizard dialog box.
 
 
 ## pw::Wizard Library Usage Example
@@ -170,6 +173,16 @@ The **run** starts the application and displays the wizard dialog box.
 ```Tcl
   # TBD
 ```
+
+
+## Creating Pages
+
+Page creation scripts have access to two, wizard-defined variables, *page* 
+and *pgFrame*. *page* is the same value as passed in the *name* argument. 
+*pgFrame* is the page's frame widget path. The page's widget hierarchy 
+should use this path as its root.
+  
+wizentry pgFrame varName varTypeSpec ?entryOpts?
 
 
 ## Predefined Validators
