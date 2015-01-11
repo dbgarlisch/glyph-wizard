@@ -30,10 +30,10 @@ Declare and initialize the application's data values.
   variable extDir {1 0 0}
 ```
 
-Define the application's wizard pages using the `pw::Wizard page add` command.
+Define the application's wizard pages using the [`pw::Wizard page add`][WizAPI-page-add] command.
 
 You can bind an application variable to an entry widget and the wizard data
-validation mechanism using the `wizentry` command.
+validation mechanism using the [`wizentry`][WizAPI-wizentry] command.
 
 ```Tcl
   pw::Wizard page add pgExtDist {
@@ -48,14 +48,14 @@ validation mechanism using the `wizentry` command.
   }
 ```
 
-Configure the wizard using the `pw::Wizard configure` command.
+Configure the wizard using the [`pw::Wizard configure`][WizAPI-configure] command.
 
 ```Tcl
   pw::Wizard configure -errorBgColor #eef -errorFgColor #00a
   pw::Wizard configure -varsCheckProc ::wizApp::varsChecker
 ```
 
-Run the wizard application using the `pw::Wizard run` command.
+Run the wizard application using the [`pw::Wizard run`][WizAPI-run] command.
 
 ```Tcl
   if { [pw::Wizard run] } {
@@ -89,3 +89,7 @@ POINTWISE.
 
 [BWidget]: http://www.sourceforge.net/projects/tcllib/
 [WizAPI]: docs/Wizard_API.md
+[WizAPI-page-add]: docs/Wizard_API.md#pwwizard-page-add-name-script
+[WizAPI-wizentry]: docs/Wizard_API.md#wizentry-pgframe-varname-vartypespec-entryopts-
+[WizAPI-configure]: docs/Wizard_API.md#pwwizard-configure-option-value-option-value-
+[WizAPI-run]: docs/Wizard_API.md#pwwizard-run
