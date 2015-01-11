@@ -182,13 +182,25 @@ and *pgFrame*. *page* is the same value as passed in the *name* argument.
 *pgFrame* is the page's frame widget path. The page's widget hierarchy 
 should use this path as its root.
   
-wizentry pgFrame varName varTypeSpec ?entryOpts?
+### **wizentry** *pgFrame varName varTypeSpec ?entryOpts?*
+
+The **wizentry** command creates a `tk::entry` widget that works with the wizard framework.
+<dl>
+  <dt><em>pgFrame</em></dt>
+  <dd>The widget path to the page's root frame.</dd>
+  <dt><em>varName</em></dt>
+  <dd>The name of the variable bound to this entry widget. If not global, <em>varName</em> should include its full namespace. For example, <code>::wizApp::extDist</code>.</dd>
+  <dt><em>varTypeSpec</em></dt>
+  <dd>The entry's value type specification. A spec consists of validator type and zero or more validator type arguments. See the [Predefined Validators](#predefined-validators) section for details.</dd>
+  <dt><em>entryOpts</em></dt>
+  <dd>Additional standard <em>tk::entry</em> widget creation options. The widget framework uses the -textvariable, -validate, and -validatecommand options and should not be specified in <em>entryOpts</em>.</dd>
+</dl>
+<br/>
 
 
 ## Predefined Validators
 
-The following, predefined validators are added by **pw::Wizard**. The validation
-procs are defined in the **pw::Wizard::vtor** namespace.
+The following, predefined validators are added by **pw::Wizard**. The validation procs are defined in the **pw::Wizard::vtor** namespace.
 
 ```Tcl
   addValidator vtor::double {@ real float}
@@ -200,13 +212,88 @@ procs are defined in the **pw::Wizard::vtor** namespace.
   addValidator vtor::arr {@ array vec vector list}
 ```
 
-### **int** *val ?minVal ?maxVal??*
-### **double** *val ?minVal ?maxVal??*
-### **text** *val*
-### **vec3** *val*
-### **int3** *val*
-### **nop** *val*
-### **arr** *val type ?minLen ?maxLen??*
+Each validator has a specific signature when used as a *varTypeSpec* in a **wizentry** call. The built in validator signatures are defined in the following sections.
+
+Application defined validators will have their own signatures and are not covered here.
+
+### **pw::Wizard::vtor::int** *val ?minVal ?maxVal??*
+
+Validates an integer value with an optional range. Aliases: `integer`.
+<dl>
+  <dt><em>val</em></dt>
+  <dd>The entry value being validated.</dd>
+  <dt><em>minVal</em></dt>
+  <dd>yyyy.</dd>
+  <dt><em>maxVal</em></dt>
+  <dd>yyyy.</dd>
+</dl>
+<br/>
+
+### **pw::Wizard::vtor::double** *val ?minVal ?maxVal??*
+
+Validates an xxxx value with an optional range. Aliases: `aaaa`.
+<dl>
+  <dt><em>val</em></dt>
+  <dd>The entry value being validated.</dd>
+  <dt><em>xxx</em></dt>
+  <dd>yyyy.</dd>
+</dl>
+<br/>
+
+### **pw::Wizard::vtor::text** *val*
+
+Validates an xxxx value with an optional range. Aliases: `aaaa`.
+<dl>
+  <dt><em>val</em></dt>
+  <dd>The entry value being validated.</dd>
+  <dt><em>xxx</em></dt>
+  <dd>yyyy.</dd>
+</dl>
+<br/>
+
+### **pw::Wizard::vtor::vec3** *val*
+
+Validates an xxxx value with an optional range. Aliases: `aaaa`.
+<dl>
+  <dt><em>val</em></dt>
+  <dd>The entry value being validated.</dd>
+  <dt><em>xxx</em></dt>
+  <dd>yyyy.</dd>
+</dl>
+<br/>
+
+### **pw::Wizard::vtor::int3** *val*
+
+Validates an xxxx value with an optional range. Aliases: `aaaa`.
+<dl>
+  <dt><em>val</em></dt>
+  <dd>The entry value being validated.</dd>
+  <dt><em>xxx</em></dt>
+  <dd>yyyy.</dd>
+</dl>
+<br/>
+
+### **pw::Wizard::vtor::nop** *val*
+
+Validates an xxxx value with an optional range. Aliases: `aaaa`.
+<dl>
+  <dt><em>val</em></dt>
+  <dd>The entry value being validated.</dd>
+  <dt><em>xxx</em></dt>
+  <dd>yyyy.</dd>
+</dl>
+<br/>
+
+### **pw::Wizard::vtor::arr** *val type ?minLen ?maxLen??*
+
+Validates an xxxx value with an optional range. Aliases: `aaaa`.
+<dl>
+  <dt><em>val</em></dt>
+  <dd>The entry value being validated.</dd>
+  <dt><em>xxx</em></dt>
+  <dd>yyyy.</dd>
+</dl>
+<br/>
 
 
 ## Disclaimer
