@@ -91,6 +91,6 @@ POINTWISE.
 [BWidget]: http://www.sourceforge.net/projects/tcllib/
 [WizAPI]: docs/Wizard_API.md
 [WizAPI-page-add]: docs/Wizard_API.md#pwwizard-page-add-name-script
-[WizAPI-wizentry]: docs/Wizard_API.md#wizentry-pgframe-varname-vartypespec-entryopts-
+[WizAPI-wizentry]: docs/Wizard_API.md#wizentry-parentpath-varname-vartypespec-entryopts
 [WizAPI-configure]: docs/Wizard_API.md#pwwizard-configure-option-value-option-value-
 [WizAPI-run]: docs/Wizard_API.md#pwwizard-run
