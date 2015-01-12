@@ -22,23 +22,6 @@
 set scriptDir [file dirname [info script]]
 source [file join $scriptDir .. wizard.tcl]
 
-proc mkPhotoIcon { gifFile } {
-  global scriptDir
-  if { ![file isfile $gifFile] } {
-    set gifFile [file join $scriptDir $gifFile]
-    if { ![file isfile $gifFile] } {
-      set gifFile {}
-    }
-  }
-  if { {} != $gifFile } {
-    set ret [image create photo -file $gifFile]
-  } else {
-    set ret {}
-  }
-  return $ret
-}
-
-
 # ===============================================
 # ===============================================
 namespace eval wizApp {
