@@ -184,7 +184,11 @@ object commands are defined below.
 * [onLeave](#onleave-page-pgframe)
 * [setTabText](#settabtext-txt)
 * [setTabIcon](#settabicon-tabicon)
-* [wizentry](#wizentry-parentpath-varname-vartypespec-entryopts)
+* [wizentry](#wizentry-parentpath-varname-vartypespec-widgetopts)
+* [wizcheckbutton](#wizcheckbutton-parentpath-varname-widgetopts)
+* [wizradiobutton](#wizradiobutton-parentpath-varname-val-widgetopts)
+* [wizlistbox](#wizlistbox-parentpath-varname-itemsvarname-widgetopts)
+* [wizcombobox](#wizcombobox-parentpath-varname-comboitems-widgetopts)
 * [wizicon](#wizicon-imagefile)
 * [setOnEnterCmd](#setonentercmd-cmd)
 * [setOnLeaveCmd](#setonleavecmd-cmd)
@@ -254,7 +258,7 @@ The **wizentry** command creates a `tk::entry` widget that works properly with
 the wizard's value validation framework.
 <dl>
   <dt><em>parentPath</em></dt>
-    <dd>The path of the entry's parent widget.</dd>
+    <dd>The path of the parent widget's window.</dd>
   <dt><em>varName</em></dt>
     <dd>The name of the variable bound to this entry. If not global,
     <em>varName</em> should include its full namespace. For example,
@@ -276,7 +280,7 @@ The **wizcheckbutton** command creates a `tk::checkbutton` widget that works
 properly with the wizard's value validation framework.
 <dl>
   <dt><em>parentPath</em></dt>
-    <dd>The path of the entry's parent widget.</dd>
+    <dd>The path of the parent widget's window.</dd>
   <dt><em>varName</em></dt>
     <dd>The name of the variable bound to this widget. If not global,
     <em>varName</em> should include its full namespace. For example,
@@ -293,7 +297,7 @@ The **wizradiobutton** command creates a `tk::radiobutton` widget that works
 properly with the wizard's value validation framework.
 <dl>
   <dt><em>parentPath</em></dt>
-    <dd>The path of the entry's parent widget.</dd>
+    <dd>The path of the parent widget's window.</dd>
   <dt><em>varName</em></dt>
     <dd>The name of the variable bound to this widget. If not global,
     <em>varName</em> should include its full namespace. For example,
@@ -314,7 +318,7 @@ The **wizlistbox** command creates a `tk::listbox` widget that works
 properly with the wizard's value validation framework.
 <dl>
   <dt><em>parentPath</em></dt>
-    <dd>The path of the entry's parent widget.</dd>
+    <dd>The path of the parent widget's window.</dd>
   <dt><em>varName</em></dt>
     <dd>The name of the variable bound to this widget. If not global,
     <em>varName</em> should include its full namespace. For example,
@@ -334,7 +338,7 @@ The **wizcombobox** command creates a `ttk::combobox` widget that works
 properly with the wizard's value validation framework.
 <dl>
   <dt><em>parentPath</em></dt>
-    <dd>The path of the entry's parent widget.</dd>
+    <dd>The path of the parent widget's window.</dd>
   <dt><em>varName</em></dt>
     <dd>The name of the variable bound to this widget. If not global,
     <em>varName</em> should include its full namespace. For example,
