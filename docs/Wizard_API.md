@@ -2,8 +2,8 @@
 
 ### Table of Contents
 * [The pw::Wizard Library](#the-pwwizard-library)
-* [pw::Wizard Command Docs](#pwwizard-commands)
-* [Wizard Pages](#wizard-pages)
+* [pw::Wizard Commands](#pwwizard-commands)
+* [Page Commands](#page-commands)
 * [Predefined Validators](#predefined-validators)
   * [Validator Helpers](#validator-helpers)
 * [pw::Wizard Library Usage Example](#pwwizard-library-usage-example)
@@ -28,6 +28,16 @@ See the script `test/test.glf` for a full example.
 ## pw::Wizard Commands
 The following *pw::Wizard* commands are supported.
 
+* [page add](#pwwizard-page-add-name-script)
+* [page names](#pwwizard-page-names-pattern)
+* [page size](#pwwizard-page-size)
+* [addValidator](#pwwizard-addvalidator-procname-valtypes-allowreplace)
+* [getValidator](#pwwizard-getvalidator-valtype)
+* [replaceValidator](#pwwizard-replacevalidator-procname-valtypes)
+* [configure](#pwwizard-configure-option-value-option-value-)
+* [cget](#pwwizard-cget-option)
+* [run](#pwwizard-run)
+
 ### **pw::Wizard page add** *name script*
 The **page add** command is used to create a wizard page object.
 <dl>
@@ -36,7 +46,7 @@ The **page add** command is used to create a wizard page object.
   <dt><em>script</em></dt>
   <dd>The tcl/Tk script used to create the page widgets and layout. This script
   is executed when the page's *onCreate* command is called. See the
-  [Wizard Pages](#wizard-pages) section for more details.</dd>
+  <em>Wizard Pages</em> section for more details.</dd>
 </dl>
 <br/>
 
@@ -64,8 +74,9 @@ The **addValidator** command adds a validator proc to the wizard's input
 validation engine. See also [Predefined Validators](#predefined-validators).
 <dl>
   <dt><em>procName</em></dt>
-  <dd>The proc called to validate a value. The proc must use the call signature
-  <code>{ val args }</code>.</dd>
+  <dd>The proc called to validate a value. The proc must use a call signature 
+  that accepts the value being validated as the first arg and an optional number
+  of additional args: <code>val ?arg ...?</code>.</dd>
   <dt><em>valTypes</em></dt>
   <dd>The list of type names that use this validator proc. If empty (the
   default), the value returned by <code>[namespace tail $procName]</code> is used. In the
@@ -95,8 +106,9 @@ This proc is equivalent to calling:
    *pw::Wizard addValidator procName $valTypes 1*
 <dl>
   <dt><em>procName</em></dt>
-  <dd>The proc called to validate a value. The proc must use the call signature
-  <code>{ val args }</code>.</dd>
+  <dd>The proc called to validate a value. The proc must use a call signature 
+  that accepts the value being validated as the first arg and an optional number
+  of additional args: <code>val ?arg ...?</code>.</dd>
   <dt><em>valTypes</em></dt>
   <dd>The list of type names that use this validator proc. If empty (the
   default), the value returned by <code>[namespace tail $procName]</code> is used. In the
@@ -108,6 +120,12 @@ This proc is equivalent to calling:
 ### **pw::Wizard configure** *?option? ?value option value ...?*
 The **configure** command sets **pw::Wizard** attribute values. If called
 without any options, a list of all valid options is returned.
+
+The following *configure* options are supported.
+* [-errorBgColor](#pwwizard-configure--errorbgcolor-color)
+* [-errorFgColor](#pwwizard-configure--errorfgcolor-color)
+* [-varsCheckProc](#pwwizard-configure--varscheckproc-procname)
+
 
 #### **pw::Wizard configure -errorBgColor** *color*
 Sets the background color displayed in *wizentry* widgets that contain invalid
@@ -129,7 +147,7 @@ values. The default is *#a00*.
 
 #### **pw::Wizard configure -varsCheckProc** *procName*
 Sets the application level data validation proc. The proc specified by
-*procName* must have the `{ status widgetPath }` call signature. This proc is
+*procName* must use the `status widgetPath` call signature. This proc is
 called by the validation engine after individual data validations are performed.
 If *status* is 1, all validations passed. If *status* is 0, at least one value
 failed validation. In all cases, the validation sequence was triggered by a
@@ -146,19 +164,30 @@ The **cget** command returns the current value of a **pw::Wizard** attribute
 value.
 <dl>
   <dt><em>option</em></dt>
-  <dd>One of the valid *configure* options.</dd>
+  <dd>One of the valid <em>configure</em> options.</dd>
 </dl>
 <br/>
 
 
 ### **pw::Wizard run**
-The **run** starts the application, runs the page creation scripts, and displays
-the wizard dialog box.
+The **run** starts the application. Prior to the display of the wizard 
+dialog box, each page's *onCreate* proc is executed.
+<br/>
 
 
-## Wizard Pages
-Wizard page objects created by calls to *pw::Wizard page add* support several
-object commands. The page object commands are defined below.
+## Page Commands
+Wizard page objects are created by calls to *pw::Wizard page add*. The page 
+object commands are defined below.
+
+* [onCreate](#oncreate-page-pgframe)
+* [onEnter](#onenter-page-pgframe)
+* [onLeave](#onleave-page-pgframe)
+* [setTabText](#settabtext-txt)
+* [setTabIcon](#settabicon-tabicon)
+* [wizentry](#wizentry-parentpath-varname-vartypespec-entryopts)
+* [wizicon](#wizicon-imagefile)
+* [setOnEnterCmd](#setonentercmd-cmd)
+* [setOnLeaveCmd](#setonleavecmd-cmd)
 
 ### **onCreate** *page pgFrame*
 The **onCreate** command calls the *onCreateCmd* script specified when the page
@@ -168,7 +197,7 @@ the page's widgets.
 <dl>
   <dt><em>page</em></dt>
   <dd>The page objects variable name. This is the same value passed to the
-  *name* argument of the call to *pw::Wizard page add*.</dd>
+  <em>name</em> argument of the call to <em>pw::Wizard page add</em>.</dd>
   <dt><em>pgFrame</em></dt>
   <dd>The page's frame widget path. The page's widget hierarchy should use this
   path as its root.</dd>
@@ -232,12 +261,13 @@ the wizard's value validation framework.
   <code>::wizApp::extDist</code>.</dd>
   <dt><em>varTypeSpec</em></dt>
   <dd>The entry's value type specification. A spec consists of validator type
-  and zero or more validator type arguments. See the
-  [Predefined Validators](#predefined-validators) section for details.</dd>
+  and zero or more validator type arguments. See the Predefined Validators 
+  section for details.</dd>
   <dt><em>entryOpts</em></dt>
   <dd>Additional standard <em>tk::entry</em> widget creation options. The widget
-  framework uses the -textvariable, -validate, and -validatecommand options and
-  should not be specified in <em>entryOpts</em>.</dd>
+  framework uses the <em>-textvariable</em>, <em>-validate</em>, and 
+  <em>-validatecommand</em> options and should not be specified in 
+  <em>entryOpts</em>.</dd>
 </dl>
 <br/>
 
@@ -278,18 +308,16 @@ time the page's tab is lowered (made hidden). The default script is {}.
 
 
 ## Predefined Validators
-The following, predefined validators are added by **pw::Wizard**. The validation
-procs are defined in the **pw::Wizard::vtor** namespace.
+Some predefined validators are added by **pw::Wizard**. The associated 
+validation procs are defined in the **pw::Wizard::vtor** namespace.
 
-```Tcl
-  addValidator vtor::double {@ real float}
-  addValidator vtor::text {@ str string}
-  addValidator vtor::int {@ integer}
-  addValidator vtor::vec3 {@ real3 double3 float3 vector3}
-  addValidator vtor::int3 {@ integer3}
-  addValidator vtor::nop {@ any none}
-  addValidator vtor::arr {@ array vec vector list}
-```
+* [pw::Wizard::vtor::int](#pwwizardvtorint-val-minval-maxval)
+* [pw::Wizard::vtor::double](#pwwizardvtordouble-val-minval-maxval)
+* [pw::Wizard::vtor::text](#pwwizardvtortext-val)
+* [pw::Wizard::vtor::vec3](#pwwizardvtorvec3-val)
+* [pw::Wizard::vtor::int3](#pwwizardvtorint3-val)
+* [pw::Wizard::vtor::nop](#pwwizardvtornop-val)
+* [pw::Wizard::vtor::arr](#pwwizardvtorarr-val-type-minlen-maxlen)
 
 Each validator has a specific signature when used as a *varTypeSpec* in a
 **wizentry** call. The built in validator signatures are defined in the
@@ -390,6 +418,10 @@ Aliases: `array`, `vec`, `vector`, `list`.
 ### Validator Helpers
 The following helper procs are defined in the **pw::Wizard::vtor** namespace.
 Custom validator can use these procs to implement their validation logic.
+
+*  [pw::Wizard::vtor::listValIsLen](#pwwizardvtorlistvalislen-val-minlen-maxlen)
+*  [pw::Wizard::vtor::valIsTypeArray](#pwwizardvtorvalistypearray-val-arrtype-minlen-maxlen)
+*  [pw::Wizard::vtor::numInRange](#pwwizardvtornuminrange-val-minval-maxval)
 
 #### **pw::Wizard::vtor::listValIsLen** *val minLen maxLen*
 Returns true if *val* is a list with the specified number of items.
