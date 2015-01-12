@@ -74,7 +74,7 @@ The **addValidator** command adds a validator proc to the wizard's input
 validation engine. See also [Predefined Validators](#predefined-validators).
 <dl>
   <dt><em>procName</em></dt>
-  <dd>The proc called to validate a value. The proc must use a call signature 
+  <dd>The proc called to validate a value. The proc must use a call signature
   that accepts the value being validated as the first arg and an optional number
   of additional args: <code>val ?arg ...?</code>.</dd>
   <dt><em>valTypes</em></dt>
@@ -106,7 +106,7 @@ This proc is equivalent to calling:
    *pw::Wizard addValidator procName $valTypes 1*
 <dl>
   <dt><em>procName</em></dt>
-  <dd>The proc called to validate a value. The proc must use a call signature 
+  <dd>The proc called to validate a value. The proc must use a call signature
   that accepts the value being validated as the first arg and an optional number
   of additional args: <code>val ?arg ...?</code>.</dd>
   <dt><em>valTypes</em></dt>
@@ -170,13 +170,13 @@ value.
 
 
 ### **pw::Wizard run**
-The **run** starts the application. Prior to the display of the wizard 
+The **run** starts the application. Prior to the display of the wizard
 dialog box, each page's *onCreate* proc is executed.
 <br/>
 
 
 ## Page Commands
-Wizard page objects are created by calls to *pw::Wizard page add*. The page 
+Wizard page objects are created by calls to *pw::Wizard page add*. The page
 object commands are defined below.
 
 * [onCreate](#oncreate-page-pgframe)
@@ -249,25 +249,102 @@ tab text.
 </dl>
 <br/>
 
-### **wizentry** *parentPath varName varTypeSpec ?entryOpts?*
+### **wizentry** *parentPath varName varTypeSpec ?widgetOpts...?*
 The **wizentry** command creates a `tk::entry` widget that works properly with
 the wizard's value validation framework.
 <dl>
   <dt><em>parentPath</em></dt>
-  <dd>The path of the entry's parent widget.</dd>
+    <dd>The path of the entry's parent widget.</dd>
   <dt><em>varName</em></dt>
-  <dd>The name of the variable bound to this entry widget. If not global,
-  <em>varName</em> should include its full namespace. For example,
-  <code>::wizApp::extDist</code>.</dd>
+    <dd>The name of the variable bound to this entry. If not global,
+    <em>varName</em> should include its full namespace. For example,
+    <code>::wizApp::extDist</code>.</dd>
   <dt><em>varTypeSpec</em></dt>
-  <dd>The entry's value type specification. A spec consists of validator type
-  and zero or more validator type arguments. See the Predefined Validators 
-  section for details.</dd>
-  <dt><em>entryOpts</em></dt>
-  <dd>Additional standard <em>tk::entry</em> widget creation options. The widget
-  framework uses the <em>-textvariable</em>, <em>-validate</em>, and 
-  <em>-validatecommand</em> options and should not be specified in 
-  <em>entryOpts</em>.</dd>
+    <dd>The entry's value type specification. A spec consists of validator type
+    and zero or more validator type arguments. See the Predefined Validators
+    section for details.</dd>
+  <dt><em>widgetOpts</em></dt>
+    <dd>Additional standard <em>tk::entry</em> widget creation options. The widget
+    framework uses the <em>-textvariable</em>, <em>-validate</em>, and
+    <em>-validatecommand</em> options and should not be specified in
+    <em>widgetOpts</em>.</dd>
+</dl>
+<br/>
+
+### **wizcheckbutton** *parentPath varName ?widgetOpts...?*
+The **wizcheckbutton** command creates a `tk::checkbutton` widget that works
+properly with the wizard's value validation framework.
+<dl>
+  <dt><em>parentPath</em></dt>
+    <dd>The path of the entry's parent widget.</dd>
+  <dt><em>varName</em></dt>
+    <dd>The name of the variable bound to this widget. If not global,
+    <em>varName</em> should include its full namespace. For example,
+    <code>::wizApp::extDist</code>.</dd>
+  <dt><em>widgetOpts</em></dt>
+    <dd>Additional standard <em>tk::checkbutton</em> widget creation options. The
+    widget framework uses the <em>-variable</em>, and <em>-command</em> options
+    and should not be specified in <em>widgetOpts</em>.</dd>
+</dl>
+<br/>
+
+### **wizradiobutton** *parentPath varName val ?widgetOpts...?*
+The **wizradiobutton** command creates a `tk::radiobutton` widget that works
+properly with the wizard's value validation framework.
+<dl>
+  <dt><em>parentPath</em></dt>
+    <dd>The path of the entry's parent widget.</dd>
+  <dt><em>varName</em></dt>
+    <dd>The name of the variable bound to this widget. If not global,
+    <em>varName</em> should include its full namespace. For example,
+    <code>::wizApp::extDist</code>.</dd>
+  <dt><em>val</em></dt>
+    <dd>The value assigned to <em>varName</em> when the radio button is
+    selected.</dd>
+  <dt><em>widgetOpts</em></dt>
+    <dd>Additional standard <em>tk::radiobutton</em> widget creation options.
+    The widget framework uses the <em>-variable</em>, <em>-value</em>,
+    and <em>-command</em> options and should not be specified in
+    <em>widgetOpts</em>.</dd>
+</dl>
+<br/>
+
+### **wizlistbox** *parentPath varName itemsVarName ?widgetOpts...?*
+The **wizlistbox** command creates a `tk::listbox` widget that works
+properly with the wizard's value validation framework.
+<dl>
+  <dt><em>parentPath</em></dt>
+    <dd>The path of the entry's parent widget.</dd>
+  <dt><em>varName</em></dt>
+    <dd>The name of the variable bound to this widget. If not global,
+    <em>varName</em> should include its full namespace. For example,
+    <code>::wizApp::extDist</code>.</dd>
+  <dt><em>itemsVarName</em></dt>
+    <dd>The name of the list variable containing the items displayed in the list
+    widget.</dd>
+  <dt><em>widgetOpts</em></dt>
+    <dd>Additional standard <em>tk::listbox</em> widget creation options.
+    The widget framework uses the <em>-listvariable</em> option and should not
+    be specified in <em>widgetOpts</em>.</dd>
+</dl>
+<br/>
+
+### **wizcombobox** *parentPath varName comboItems ?widgetOpts...?*
+The **wizcombobox** command creates a `ttk::combobox` widget that works
+properly with the wizard's value validation framework.
+<dl>
+  <dt><em>parentPath</em></dt>
+    <dd>The path of the entry's parent widget.</dd>
+  <dt><em>varName</em></dt>
+    <dd>The name of the variable bound to this widget. If not global,
+    <em>varName</em> should include its full namespace. For example,
+    <code>::wizApp::extDist</code>.</dd>
+  <dt><em>comboItems</em></dt>
+    <dd>The list of items displayed in the list widget.</dd>
+  <dt><em>widgetOpts</em></dt>
+    <dd>Additional standard <em>ttk::combobox</em> widget creation options.
+    The widget framework uses the <em>-listvariable</em> option and should not
+    be specified in <em>widgetOpts</em>.</dd>
 </dl>
 <br/>
 
@@ -308,7 +385,7 @@ time the page's tab is lowered (made hidden). The default script is {}.
 
 
 ## Predefined Validators
-Some predefined validators are added by **pw::Wizard**. The associated 
+Some predefined validators are added by **pw::Wizard**. The associated
 validation procs are defined in the **pw::Wizard::vtor** namespace.
 
 * [pw::Wizard::vtor::int](#pwwizardvtorint-val-minval-maxval)

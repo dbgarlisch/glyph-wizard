@@ -355,7 +355,7 @@ namespace eval pw::Wizard {
     }
   }
 
-  proc validate { valType action newVal oldVal w v} {
+  proc validate { valType action newVal oldVal w v } {
     #puts "pw::Wizard::validate valType($valType) action($action) newVal($newVal) oldVal($oldVal) '$w' '$v'"
     if { -1 != $action || {forced} == $v} {
       if { [callValidator $valType $newVal] } {
@@ -363,16 +363,34 @@ namespace eval pw::Wizard {
       } else {
         setError $w
       }
-
-      # cancel any pending checkFinish calls for $w
-      after cancel pw::Wizard::checkFinish $w
-
-      # Schedule a call to pw::Wizard::checkFinish for AFTER the tk entry-widget
-      # value validation mechanism has finished. We cannot call checkFinish here
-      # because the widget's associated -textvariable has not been updated yet!
-      after idle pw::Wizard::checkFinish $w
+      callCheckFinish $w
     }
     return 1
+  }
+
+  proc onCheckButton { w varName } {
+    #puts "onCheckButton $w $varName=[set $varName]"
+    callCheckFinish $w
+  }
+
+  proc onRadioButton { w varName } {
+    #puts "onRadioButton $w $varName=[set $varName]"
+    callCheckFinish $w
+  }
+
+  proc onListBox { w varName itemsVarName } {
+    set items [set $itemsVarName]
+    set $varName {}
+    foreach ndx [$w curselection] {
+      lappend $varName [lindex $items $ndx]
+    }
+    #puts "onListBox $w $varName=[list [set $varName]] $itemsVarName"
+    callCheckFinish $w
+  }
+
+  proc onComboBox { w varName } {
+    #puts "onComboBox $w $varName=[list [set $varName]]"
+    callCheckFinish $w
   }
 
   proc callValidator { valType val } {
@@ -388,6 +406,16 @@ namespace eval pw::Wizard {
       error "Could not find validator($valType)."
     }
     return $ret
+  }
+
+  proc callCheckFinish { w } {
+    # cancel any pending checkFinish calls for $w
+    after cancel pw::Wizard::checkFinish $w
+
+    # Schedule a call to pw::Wizard::checkFinish for AFTER the tk entry-widget
+    # value validation mechanism has finished. We cannot call checkFinish here
+    # because the widget's associated -textvariable has not been updated yet!
+    after idle pw::Wizard::checkFinish $w
   }
 
 
@@ -445,13 +473,44 @@ namespace eval pw::Wizard {
         namespace eval $ns [list proc onLeave { page pgFrame } $cmd]
       }
 
-      proc wizentry { parentPath textVar varType args } {
-        set wKey [string map {:: _} $textVar]
-        set w [entry $parentPath.$wKey \
-          -textvariable $textVar \
-          -validate key \
-          -validatecommand "pw::Wizard::validate \{$varType\} %d %P %s %W %V" \
-          {*}$args]
+      proc wizentry { parentPath varName varTypeSpec args } {
+        set w "$parentPath.[string map {:: _} $varName]"
+        entry $w {*}$args -textvariable $varName -validate key \
+          -validatecommand \
+            "pw::Wizard::validate [list $varTypeSpec] %d %P %s %W %V"
+        return $w
+      }
+
+      proc wizcheckbutton { parentPath varName args } {
+        set w "$parentPath.[string map {:: _} $varName]"
+        checkbutton $w {*}$args -variable $varName \
+          -command "pw::Wizard::onCheckButton $w $varName"
+        return $w
+      }
+
+      proc wizradiobutton { parentPath varName val args } {
+        set n 0
+        set w "$parentPath.[string map {:: _} $varName]-rad$n"
+        while { [winfo exists $w] } {
+          set w "$parentPath.[string map {:: _} $varName]-rad[incr n]"
+        }
+        radiobutton $w {*}$args -variable $varName -value $val \
+          -command "pw::Wizard::onRadioButton $w $varName"
+        return $w
+      }
+
+      proc wizlistbox { parentPath varName itemsVarName args } {
+        set w "$parentPath.[string map {:: _} $varName]"
+        listbox $w {*}$args -listvariable $itemsVarName
+        bind $w <<ListboxSelect>> \
+          "pw::Wizard::onListBox $w $varName $itemsVarName"
+        return $w
+      }
+
+      proc wizcombobox { parentPath varName comboItems args } {
+        set w "$parentPath.[string map {:: _} $varName]"
+        ttk::combobox $w {*}$args -values $comboItems -textvariable $varName
+        bind $w <<ComboboxSelected>> "pw::Wizard::onComboBox $w $varName"
         return $w
       }
 

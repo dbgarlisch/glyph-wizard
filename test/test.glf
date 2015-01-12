@@ -28,6 +28,15 @@ namespace eval wizApp {
   variable extDist 1.0
   variable extSteps 10
   variable extDir {1 0 0}
+  variable lights 0
+  variable camera 1
+  variable action 0
+  variable axis y
+  variable lbox {your}
+  variable cbox {list}
+  namespace eval priv {
+    variable lbItems {choose your option wisely}
+  }
 
   # A custom data item validation proc that can be registered with a call to
   # addValidator or replaceValidator. Return 1/0 if $val is valid/invalid.
@@ -45,25 +54,18 @@ namespace eval wizApp {
   # whose value changed and trigered this call.
   #
   proc varsChecker { valsOk w } {
-    #variable extDist
-    #variable extSteps
-    #variable extDir
     #puts "[namespace which varsChecker] \{ $valsOk '$w' \}"
-    #puts "  [namespace which -variable extDist] = '$extDist'"
-    #puts "  [namespace which -variable extSteps] = '$extSteps'"
-    #puts "  [namespace which -variable extDir] = '$extDir'"
-
+    #set vars [lsort [info vars ::wizApp::*]]
+    #foreach var $vars {
+    #  puts [format "  %-20.20s = %s" [namespace which -variable $var] \
+    #                                 [set $var]]
+    #}
     # return 0 if data is not valid
     return 1
   }
 
 
   proc run { } {
-    variable extDist
-    variable extSteps
-    variable extDir
-
-    # ===============================================
     # ===============================================
     pw::Wizard page add pgExtDist {
       # configure the page
@@ -74,9 +76,15 @@ namespace eval wizApp {
         -row 0 -column 0 -sticky we -pady 3 -padx 3
       grid [wizentry $pgFrame ::wizApp::extDist {double 1.0 5.0} -width 8] \
         -row 0 -column 1 -sticky w -pady 3 -padx 3
+
+      grid [labelframe $pgFrame.lbl -text "Steps: "] \
+        -row 1 -column 0 -columnspan 2 -sticky we -pady 3 -padx 3
+      pack [wizcheckbutton $pgFrame ::wizApp::lights -text Lights] \
+           [wizcheckbutton $pgFrame ::wizApp::camera -text Camera] \
+           [wizcheckbutton $pgFrame ::wizApp::action -text Action!] \
+           -in $pgFrame.lbl -padx 5 -anchor w
     }
 
-    # ===============================================
     # ===============================================
     pw::Wizard page add pgExtSteps {
       # configure the page
@@ -87,9 +95,15 @@ namespace eval wizApp {
         -row 0 -column 0 -sticky we -pady 3 -padx 3
       grid [wizentry $pgFrame ::wizApp::extSteps {integer 1 10} -width 8] \
         -row 0 -column 1 -sticky w -pady 3 -padx 3
+
+      grid [labelframe $pgFrame.lbl -text "Axis: "] \
+        -row 1 -column 0 -columnspan 2 -sticky we -pady 3 -padx 3
+      pack [wizradiobutton $pgFrame ::wizApp::axis x -text {x axis}] \
+           [wizradiobutton $pgFrame ::wizApp::axis y -text {y axis}] \
+           [wizradiobutton $pgFrame ::wizApp::axis z -text {z axis}] \
+           -in $pgFrame.lbl -padx 5 -anchor w
     }
 
-    # ===============================================
     # ===============================================
     pw::Wizard page add pgExtDir {
       # configure the page
@@ -107,6 +121,12 @@ namespace eval wizApp {
         -row 0 -column 0 -sticky we -pady 3 -padx 3
       grid [wizentry $pgFrame ::wizApp::extDir vec3 -width 30] \
         -row 0 -column 1 -sticky w -pady 3 -padx 3
+      grid [wizlistbox $pgFrame ::wizApp::lbox ::wizApp::priv::lbItems \
+        -width 30 -height 0] -row 1 -column 0 -columnspan 2 -sticky we \
+        -pady 3 -padx 3
+      set cbItems {another list of items}
+      grid [wizcombobox $pgFrame ::wizApp::cbox $cbItems -width 30 -state readonly] \
+        -row 2 -column 0 -columnspan 2 -sticky we -pady 3 -padx 3
     }
 
     #pw::Wizard configure -errorBgColor #eef -errorFgColor #00a
@@ -127,9 +147,12 @@ namespace eval wizApp {
 
     if { [pw::Wizard run] } {
       puts "wizard finished"
-      puts "  extDist : '$extDist'"
-      puts "  extSteps: '$extSteps'"
-      puts "  extDir  : '$extDir'"
+      set vars [lsort [info vars ::wizApp::*]]
+      foreach var $vars {
+        puts [format "  %-20.20s = %s" \
+          [namespace which -variable $var] \
+          [set $var]]
+      }
     }
   }
 }
