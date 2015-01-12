@@ -84,8 +84,8 @@ namespace eval wizApp {
     # ===============================================
     pw::Wizard page add pgExtDist {
       # configure the page
-      $page setTabIcon [mkPhotoIcon {arrow-right.gif}]
-      $page setTabText "Extrude Distance"
+      setTabIcon [wizicon {arrow-right.gif}]
+      setTabText "Extrude Distance"
       # create page's widgets
       grid [label $pgFrame.lblExtDist -text "Extrude Distance" -anchor w] \
         -row 0 -column 0 -sticky we -pady 3 -padx 3
@@ -97,8 +97,8 @@ namespace eval wizApp {
     # ===============================================
     pw::Wizard page add pgExtSteps {
       # configure the page
-      $page setTabIcon [mkPhotoIcon {double-arrow.gif}]
-      $page setTabText "Extrude Steps"
+      setTabIcon [wizicon {double-arrow.gif}]
+      setTabText "Extrude Steps"
       # create page's widgets
       grid [label $pgFrame.lblExtSteps -text "Extrude Steps" -anchor w] \
         -row 0 -column 0 -sticky we -pady 3 -padx 3
@@ -110,8 +110,8 @@ namespace eval wizApp {
     # ===============================================
     pw::Wizard page add pgExtDir {
       # configure the page
-      $page setTabIcon [mkPhotoIcon {arrow-left.gif}]
-      $page setTabText "Extrude Direction"
+      setTabIcon [wizicon {arrow-left.gif}]
+      setTabText "Extrude Direction"
       #setOnEnterCmd {
       #  puts "[namespace which onEnter] \{ $page $pgFrame \}"
       #}
@@ -128,7 +128,6 @@ namespace eval wizApp {
 
     #pw::Wizard configure -errorBgColor #eef -errorFgColor #00a
     pw::Wizard configure -varsCheckProc ::wizApp::varsChecker
-
     pw::Wizard addValidator ::wizApp::myType
 
     puts {}

@@ -2,15 +2,15 @@
 
 ### Table of Contents
 * [The pw::Wizard Library](#the-pwwizard-library)
-* [pw::Wizard Command Docs](#pwwizard-command-docs)
-* [pw::Wizard Library Usage Example](#pwwizard-library-usage-example)
-* [Creating Pages](#creating-pages)
+* [pw::Wizard Command Docs](#pwwizard-commands)
+* [Wizard Pages](#wizard-pages)
 * [Predefined Validators](#predefined-validators)
+  * [Validator Helpers](#validator-helpers)
+* [pw::Wizard Library Usage Example](#pwwizard-library-usage-example)
 * [Disclaimer](#disclaimer)
 
 
 ## The pw::Wizard Library
-
 This library is implemented as a command ensemble named **pw::Wizard**.
 
 Calls to this library are made using the **pw::Wizard command args**
@@ -25,24 +25,23 @@ pw::Wizard configure -errorBgColor #eef
 See the script `test/test.glf` for a full example.
 
 
-## pw::Wizard Command Docs
+## pw::Wizard Commands
+The following *pw::Wizard* commands are supported.
 
 ### **pw::Wizard page add** *name script*
-
 The **page add** command is used to create a wizard page object.
 <dl>
   <dt><em>name</em></dt>
   <dd>The page object name. Can be any valid tcl variable name.</dd>
   <dt><em>script</em></dt>
-  <dd>The tcl/Tk script used to create the page widgets and layout. This script is 
-  not executed immediately. It is executed later in the call to <em>pw::Wizard run</em>. 
-  See the Creating Pages section for more details.</dd>
+  <dd>The tcl/Tk script used to create the page widgets and layout. This script
+  is executed when the page's *onCreate* command is called. See the
+  [Wizard Pages](#wizard-pages) section for more details.</dd>
 </dl>
 <br/>
 
 
 ### **pw::Wizard page names** *?pattern?*
-
 The **page names** command is returns a list of page names matching *pattern*.
 If *pattern* is not given, all page names are returned.
 <dl>
@@ -54,7 +53,6 @@ If *pattern* is not given, all page names are returned.
 
 
 ### **pw::Wizard page size**
-
 The **page size** command returns the number of pages added.
 <dl>
 </dl>
@@ -62,7 +60,6 @@ The **page size** command returns the number of pages added.
 
 
 ### **pw::Wizard addValidator** *procName ?valTypes? ?allowReplace?*
-
 The **addValidator** command adds a validator proc to the wizard's input
 validation engine. See also [Predefined Validators](#predefined-validators).
 <dl>
@@ -81,7 +78,6 @@ validation engine. See also [Predefined Validators](#predefined-validators).
 
 
 ### **pw::Wizard getValidator** *?valType?*
-
 The **getValidator** command returns the validator proc associated with a given
 *valType*.
 <dl>
@@ -93,12 +89,10 @@ The **getValidator** command returns the validator proc associated with a given
 
 
 ### **pw::Wizard replaceValidator** *procName ?valTypes?*
-
 The **replaceValidator** replaces an exisiting validator proc.
 
 This proc is equivalent to calling:
    *pw::Wizard addValidator procName $valTypes 1*
-
 <dl>
   <dt><em>procName</em></dt>
   <dd>The proc called to validate a value. The proc must use the call signature
@@ -112,12 +106,10 @@ This proc is equivalent to calling:
 
 
 ### **pw::Wizard configure** *?option? ?value option value ...?*
-
 The **configure** command sets **pw::Wizard** attribute values. If called
 without any options, a list of all valid options is returned.
 
 #### **pw::Wizard configure -errorBgColor** *color*
-
 Sets the background color displayed in *wizentry* widgets that contain invalid
 values. The default is *#fee*.
 <dl>
@@ -127,7 +119,6 @@ values. The default is *#fee*.
 <br/>
 
 #### **pw::Wizard configure -errorFgColor** *color*
-
 Sets the foreground color displayed in *wizentry* widgets that contain invalid
 values. The default is *#a00*.
 <dl>
@@ -137,14 +128,12 @@ values. The default is *#a00*.
 <br/>
 
 #### **pw::Wizard configure -varsCheckProc** *procName*
-
 Sets the application level data validation proc. The proc specified by
 *procName* must have the `{ status widgetPath }` call signature. This proc is
 called by the validation engine after individual data validations are performed.
 If *status* is 1, all validations passed. If *status* is 0, at least one value
 failed validation. In all cases, the validation sequence was triggered by a
 change to the value of *widgetPath*.</dd>
-
 <dl>
   <dt><em>procName</em></dt>
   <dd>The name of an application defined data validation proc.</dd>
@@ -153,7 +142,6 @@ change to the value of *widgetPath*.</dd>
 
 
 ### **pw::Wizard cget** *option*
-
 The **cget** command returns the current value of a **pw::Wizard** attribute
 value.
 <dl>
@@ -164,43 +152,134 @@ value.
 
 
 ### **pw::Wizard run**
-
-The **run** starts the application, runs the page creation scripts, and displays the wizard dialog box.
-
-
-## pw::Wizard Library Usage Example
-
-```Tcl
-  # TBD
-```
+The **run** starts the application, runs the page creation scripts, and displays
+the wizard dialog box.
 
 
-## Creating Pages
+## Wizard Pages
+Wizard page objects created by calls to *pw::Wizard page add* support several
+object commands. The page object commands are defined below.
 
-Page creation scripts have access to two, wizard-defined variables, *page* 
-and *pgFrame*. *page* is the same value as passed in the *name* argument. 
-*pgFrame* is the page's frame widget path. The page's widget hierarchy 
-should use this path as its root.
-  
-### **wizentry** *pgFrame varName varTypeSpec ?entryOpts?*
-
-The **wizentry** command creates a `tk::entry` widget that works with the wizard framework.
+### **onCreate** *page pgFrame*
+The **onCreate** command calls the *onCreateCmd* script specified when the page
+object was created by *pw::Wizard page add*. This command should never be called
+directly. This command is called when needed by **pw::Wizard::run** to create
+the page's widgets.
 <dl>
+  <dt><em>page</em></dt>
+  <dd>The page objects variable name. This is the same value passed to the
+  *name* argument of the call to *pw::Wizard page add*.</dd>
   <dt><em>pgFrame</em></dt>
-  <dd>The widget path to the page's root frame.</dd>
+  <dd>The page's frame widget path. The page's widget hierarchy should use this
+  path as its root.</dd>
+</dl>
+<br/>
+
+### **onEnter** *page pgFrame*
+The **onEnter** command is called by the wizard framework every time the page's
+tab is raised (made visible). This command should never be called directly. This
+command is called by the wizard framwork as needed. See the *setOnEnterCmd*
+command.
+<dl>
+  <dt><em>page</em></dt>
+  <dd>The page objects variable name.</dd>
+  <dt><em>pgFrame</em></dt>
+  <dd>The page's frame widget path.</dd>
+</dl>
+<br/>
+
+### **onLeave** *page pgFrame*
+The **onLeave** command is called by the wizard framework every time the page's
+tab is lowered (made hidden). This command should never be called directly. This
+command is called by the wizard framwork as needed. See the *setOnLeaveCmd*
+command.
+<dl>
+  <dt><em>page</em></dt>
+  <dd>The page objects variable name.</dd>
+  <dt><em>pgFrame</em></dt>
+  <dd>The page's frame widget path.</dd>
+</dl>
+<br/>
+
+### **setTabText** *txt*
+The **setTabText** command defines the text displayed on the page tab.
+<dl>
+  <dt><em>txt</em></dt>
+  <dd>The tab text string. Any value can be used. However, shorter strings
+  usually look better in the GUI.</dd>
+</dl>
+<br/>
+
+### **setTabIcon** *tabIcon*
+The **setTabIcon** command defines the icon displayed to the left of the page
+tab text.
+<dl>
+  <dt><em>tabIcon</em></dt>
+  <dd>The icon resource. Typically, this is a value returned from a call to
+  <em>[image create ...]</em> or <em>wizicon</em>.</dd>
+</dl>
+<br/>
+
+### **wizentry** *parentPath varName varTypeSpec ?entryOpts?*
+The **wizentry** command creates a `tk::entry` widget that works properly with
+the wizard's value validation framework.
+<dl>
+  <dt><em>parentPath</em></dt>
+  <dd>The path of the entry's parent widget.</dd>
   <dt><em>varName</em></dt>
-  <dd>The name of the variable bound to this entry widget. If not global, <em>varName</em> should include its full namespace. For example, <code>::wizApp::extDist</code>.</dd>
+  <dd>The name of the variable bound to this entry widget. If not global,
+  <em>varName</em> should include its full namespace. For example,
+  <code>::wizApp::extDist</code>.</dd>
   <dt><em>varTypeSpec</em></dt>
-  <dd>The entry's value type specification. A spec consists of validator type and zero or more validator type arguments. See the [Predefined Validators](#predefined-validators) section for details.</dd>
+  <dd>The entry's value type specification. A spec consists of validator type
+  and zero or more validator type arguments. See the
+  [Predefined Validators](#predefined-validators) section for details.</dd>
   <dt><em>entryOpts</em></dt>
-  <dd>Additional standard <em>tk::entry</em> widget creation options. The widget framework uses the -textvariable, -validate, and -validatecommand options and should not be specified in <em>entryOpts</em>.</dd>
+  <dd>Additional standard <em>tk::entry</em> widget creation options. The widget
+  framework uses the -textvariable, -validate, and -validatecommand options and
+  should not be specified in <em>entryOpts</em>.</dd>
+</dl>
+<br/>
+
+### **wizicon** *imageFile*
+The **wizicon** command creates an icon resource from an image file.
+
+Your Tcl installation may support many image formats. However, for maximum
+compatability, it is best to only use <em>gif</em> files.
+<dl>
+  <dt><em>imageFile</em></dt>
+  <dd>The icon image file. If <em>imageFile</em> cannot be found in the current
+  directory, this command also looks for it in the application script
+  directory.</dd>
+</dl>
+<br/>
+
+### **setOnEnterCmd** *cmd*
+The **setOnEnterCmd** command defines the script executed by the page object's
+*onEnter* command. The *onEnter* command is called by the wizard framework every
+time the page's tab is raised (made visible). The default script is {}.
+<dl>
+  <dt><em>cmd</em></dt>
+  <dd>The onEnter command script. This script has access to the <em>page</em>
+  and <em>pgFrame</em> arguments passed to <em>onEnter</em>.</dd>
+</dl>
+<br/>
+
+### **setOnLeaveCmd** *cmd*
+The **setOnLeaveCmd** command defines the script executed by the page object's
+*onLeave* command. The *onLeave* command is called by the wizard framework every
+time the page's tab is lowered (made hidden). The default script is {}.
+<dl>
+  <dt><em>cmd</em></dt>
+  <dd>The onLeave command script. This script has access to the <em>page</em>
+  and <em>pgFrame</em> arguments passed to <em>onLeave</em>.</dd>
 </dl>
 <br/>
 
 
 ## Predefined Validators
-
-The following, predefined validators are added by **pw::Wizard**. The validation procs are defined in the **pw::Wizard::vtor** namespace.
+The following, predefined validators are added by **pw::Wizard**. The validation
+procs are defined in the **pw::Wizard::vtor** namespace.
 
 ```Tcl
   addValidator vtor::double {@ real float}
@@ -212,88 +291,158 @@ The following, predefined validators are added by **pw::Wizard**. The validation
   addValidator vtor::arr {@ array vec vector list}
 ```
 
-Each validator has a specific signature when used as a *varTypeSpec* in a **wizentry** call. The built in validator signatures are defined in the following sections.
+Each validator has a specific signature when used as a *varTypeSpec* in a
+**wizentry** call. The built in validator signatures are defined in the
+following sections.
 
-Application defined validators will have their own signatures and are not covered here.
+Any application defined validators added with a call to *pw::Wizard addValidator*
+will have their own signatures and are not covered here.
 
 ### **pw::Wizard::vtor::int** *val ?minVal ?maxVal??*
-
-Validates an integer value with an optional range. Aliases: `integer`.
+Validates an integer value with an optional range.
+Aliases: `integer`.
 <dl>
   <dt><em>val</em></dt>
   <dd>The entry value being validated.</dd>
   <dt><em>minVal</em></dt>
-  <dd>yyyy.</dd>
+  <dd>If defined, <em>val</em> must be greater than or equal to this value. If
+  set to <b>inf</b>, <em>minVal</em> is not enforced.</dd>
   <dt><em>maxVal</em></dt>
-  <dd>yyyy.</dd>
+  <dd>If defined, <em>val</em> must be less than or equal to this value. If
+  set to <b>inf</b>, <em>maxVal</em> is not enforced.</dd>
 </dl>
 <br/>
 
 ### **pw::Wizard::vtor::double** *val ?minVal ?maxVal??*
-
-Validates an xxxx value with an optional range. Aliases: `aaaa`.
+Validates a floating point value with an optional range.
+Aliases: `real`, `float`.
 <dl>
   <dt><em>val</em></dt>
   <dd>The entry value being validated.</dd>
-  <dt><em>xxx</em></dt>
-  <dd>yyyy.</dd>
+  <dt><em>minVal</em></dt>
+  <dd>If defined, <em>val</em> must be greater than or equal to this value. If
+  set to <b>inf</b>, <em>minVal</em> is not enforced.</dd>
+  <dt><em>maxVal</em></dt>
+  <dd>If defined, <em>val</em> must be less than or equal to this value. If
+  set to <b>inf</b>, <em>maxVal</em> is not enforced.</dd>
 </dl>
 <br/>
 
 ### **pw::Wizard::vtor::text** *val*
-
-Validates an xxxx value with an optional range. Aliases: `aaaa`.
+Validates a string value as not empty.
+Aliases: `str`, `string`.
 <dl>
   <dt><em>val</em></dt>
   <dd>The entry value being validated.</dd>
-  <dt><em>xxx</em></dt>
-  <dd>yyyy.</dd>
 </dl>
 <br/>
 
 ### **pw::Wizard::vtor::vec3** *val*
+Validates an array of three floating point values.
+Aliases: `real3`, `double3`, `float3`, `vector3`.
 
-Validates an xxxx value with an optional range. Aliases: `aaaa`.
+This type is equivalent to *pw::Wizard::vtor::arr $val double 3 3*
 <dl>
   <dt><em>val</em></dt>
   <dd>The entry value being validated.</dd>
-  <dt><em>xxx</em></dt>
-  <dd>yyyy.</dd>
 </dl>
 <br/>
 
 ### **pw::Wizard::vtor::int3** *val*
+Validates an array of three integer values.
+Aliases: `integer3`.
 
-Validates an xxxx value with an optional range. Aliases: `aaaa`.
+This type is equivalent to *pw::Wizard::vtor::arr $val int 3 3*
 <dl>
   <dt><em>val</em></dt>
   <dd>The entry value being validated.</dd>
-  <dt><em>xxx</em></dt>
-  <dd>yyyy.</dd>
 </dl>
 <br/>
 
 ### **pw::Wizard::vtor::nop** *val*
-
-Validates an xxxx value with an optional range. Aliases: `aaaa`.
+Accepts any value without restriction.
+Aliases: `any`, `none`.
 <dl>
   <dt><em>val</em></dt>
   <dd>The entry value being validated.</dd>
-  <dt><em>xxx</em></dt>
-  <dd>yyyy.</dd>
 </dl>
 <br/>
 
 ### **pw::Wizard::vtor::arr** *val type ?minLen ?maxLen??*
-
-Validates an xxxx value with an optional range. Aliases: `aaaa`.
+Validates an array of same-typed values with an optional array length.
+Aliases: `array`, `vec`, `vector`, `list`.
 <dl>
   <dt><em>val</em></dt>
   <dd>The entry value being validated.</dd>
-  <dt><em>xxx</em></dt>
-  <dd>yyyy.</dd>
+  <dt><em>type</em></dt>
+  <dd>The array item type. This should be one of the registered validator
+  types such as <em>int</em> or <em>double</em>.</dd>
+  <dt><em>minLen</em></dt>
+  <dd>If defined, the number of items in <em>val</em> must be greater than or
+  equal to this value. If set to <b>inf</b>, <em>minLen</em> is not
+  enforced.</dd>
+  <dt><em>maxLen</em></dt>
+  <dd>If defined, the number of items in <em>val</em> must be less than or equal
+  to this value. If set to <b>inf</b>, <em>maxLen</em> is not enforced.</dd>
 </dl>
 <br/>
+
+### Validator Helpers
+The following helper procs are defined in the **pw::Wizard::vtor** namespace.
+Custom validator can use these procs to implement their validation logic.
+
+#### **pw::Wizard::vtor::listValIsLen** *val minLen maxLen*
+Returns true if *val* is a list with the specified number of items.
+<dl>
+  <dt><em>val</em></dt>
+  <dd>The value being validated.</dd>
+  <dt><em>minLen</em></dt>
+  <dd>The number of items in <em>val</em> must be greater than or equal to this
+  value. If set to <b>inf</b>, <em>minLen</em> is not enforced.</dd>
+  <dt><em>maxLen</em></dt>
+  <dd>The number of items in <em>val</em> must be less than or equal to this
+  value. If set to <b>inf</b>, <em>maxLen</em> is not enforced.</dd>
+</dl>
+<br/>
+
+#### **pw::Wizard::vtor::valIsTypeArray** *val arrType minLen maxLen*
+Returns true if *val* is a list with the specified number of items of the
+given type.
+<dl>
+  <dt><em>val</em></dt>
+  <dd>The value being validated.</dd>
+  <dt><em>arrType</em></dt>
+  <dd>The array item type. This should be one of the registered validator
+  types such as <em>int</em> or <em>double</em>.</dd>
+  <dt><em>minLen</em></dt>
+  <dd>The number of items in <em>val</em> must be greater than or equal to this
+  value. If set to <b>inf</b>, <em>minLen</em> is not enforced.</dd>
+  <dt><em>maxLen</em></dt>
+  <dd>The number of items in <em>val</em> must be less than or equal to this
+  value. If set to <b>inf</b>, <em>maxLen</em> is not enforced.</dd>
+</dl>
+<br/>
+
+#### **pw::Wizard::vtor::numInRange** *val minVal maxVal*
+Returns true if *val* is a list with the specified number of items.
+<dl>
+  <dt><em>val</em></dt>
+    <dd>The value being validated.</dd>
+  <dt><em>minVal</em></dt>
+    <dd><em>val</em> must be greater than or equal to this value. If set to
+    <b>inf</b>, <em>minVal</em> is not enforced.</dd>
+  <dt><em>maxVal</em></dt>
+    <dd><em>val</em> must be less than or equal to this value. If set to
+    <b>inf</b>, <em>maxVal</em> is not enforced.</dd>
+</dl>
+<br/>
+
+
+## pw::Wizard Library Usage Example
+
+```Tcl
+  # TBD
+```
 
 
 ## Disclaimer

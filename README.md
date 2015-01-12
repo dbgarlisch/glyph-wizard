@@ -30,7 +30,8 @@ Declare and initialize the application's data values.
   variable extDir {1 0 0}
 ```
 
-Define the application's wizard pages using the [`pw::Wizard page add`][WizAPI-page-add] command.
+Define the application's wizard pages using the
+[`pw::Wizard page add`][WizAPI-page-add] command.
 
 You can bind an application variable to an entry widget and the wizard data
 validation mechanism using the [`wizentry`][WizAPI-wizentry] command.
@@ -38,8 +39,8 @@ validation mechanism using the [`wizentry`][WizAPI-wizentry] command.
 ```Tcl
   pw::Wizard page add pgExtDist {
     # configure the page
-    $page setTabIcon [mkPhotoIcon {arrow-right.gif}]
-    $page setTabText "Extrude Distance"
+    setTabIcon [mkPhotoIcon {arrow-right.gif}]
+    setTabText "Extrude Distance"
     # create page's widgets
     grid [label $pgFrame.lblExtDist -text "Extrude Distance" -anchor w] \
       -row 0 -column 0 -sticky we -pady 3 -padx 3

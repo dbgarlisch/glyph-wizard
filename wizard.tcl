@@ -17,7 +17,9 @@
 #
 # ===============================================
 
-if { ![namespace exists pw::Wizard] } {
+if { [namespace exists pw::Wizard] } {
+  return
+}
 
 global auto_path
 lappend auto_path [file join [file dirname [info script]] {bwidget-1.9.8}]
@@ -353,89 +355,6 @@ namespace eval pw::Wizard {
     }
   }
 
-
-  #####################################################################
-  # The data validation handlers.
-  #####################################################################
-
-  namespace eval vtor {
-    proc valIsType { val type } {
-      return [string is $type -strict $val]
-    }
-
-    proc listValIsLen { val minLen maxLen } {
-      set valLen [llength $val]
-      if { $minLen <= 0 } {
-        set minLen $valLen
-      }
-      if { $maxLen <= 0 } {
-        set maxLen $valLen
-      }
-      return [expr {$minLen <= $valLen && $maxLen >= $valLen}]
-    }
-
-    proc valIsTypeArray { val arrType minLen maxLen } {
-      set ret 0
-      if { [listValIsLen $val $minLen $maxLen] } {
-        set ret 1
-        foreach v $val {
-          if { ![valIsType $v $arrType] } {
-            set ret 0
-            break
-          }
-        }
-      }
-      return $ret
-    }
-
-    proc numInRange { val minVal maxVal } {
-      set ret 1
-      if { $minVal != {inf} && $val < $minVal } {
-        set ret 0
-      } elseif { $maxVal != {inf} && $val > $maxVal } {
-        set ret 0
-      }
-      return $ret
-    }
-
-    proc int { val args } {
-      lappend args inf inf
-      lassign $args minVal maxVal
-      return [expr {[valIsType $val integer] &&
-        [numInRange $val $minVal $maxVal]}]
-    }
-
-    proc double { val args } {
-      lappend args inf inf
-      lassign $args minVal maxVal
-      return [expr {[valIsType $val double] && \
-        [numInRange $val $minVal $maxVal]}]
-    }
-
-    proc text { val args } {
-      return [valIsType $val alnum]
-    }
-
-    proc arr { val args } {
-      # args: {type ?minLen? ?maxLen?}
-      lappend args 0 0
-      lassign $args arrType minLen maxLen
-      return [pw::Wizard::valIsTypeArray $val $arrType $minLen $maxLen]
-    }
-
-    proc vec3 { val args } {
-      return [valIsTypeArray $val double 3 3]
-    }
-
-    proc int3 { val args } {
-      return [valIsTypeArray $val integer 3 3]
-    }
-
-    proc nop { val args } {
-      return 1
-    }
-  }
-
   proc validate { valType action newVal oldVal w v} {
     #puts "pw::Wizard::validate valType($valType) action($action) newVal($newVal) oldVal($oldVal) '$w' '$v'"
     if { -1 != $action || {forced} == $v} {
@@ -526,19 +445,117 @@ namespace eval pw::Wizard {
         namespace eval $ns [list proc onLeave { page pgFrame } $cmd]
       }
 
-      proc wizentry { pgFrame textVar varType args } {
+      proc wizentry { parentPath textVar varType args } {
         set wKey [string map {:: _} $textVar]
-        set w [entry $pgFrame.$wKey \
+        set w [entry $parentPath.$wKey \
           -textvariable $textVar \
           -validate key \
           -validatecommand "pw::Wizard::validate \{$varType\} %d %P %s %W %V" \
           {*}$args]
         return $w
       }
+
+      proc wizicon { gifFile } {
+        if { ![file isfile $gifFile] } {
+          set gifFile [file join [file dirname [info script]] $gifFile]
+          if { ![file isfile $gifFile] } {
+            set gifFile {}
+          }
+        }
+        if { {} != $gifFile } {
+          set ret [image create photo -file $gifFile]
+        } else {
+          set ret {}
+        }
+        return $ret
+      }
     }
 
     # Create page instance namespace ensemble
     namespace eval $page [list namespace ensemble create -command ::$page]
+  }
+
+
+  #####################################################################
+  # The data validation handlers.
+  #####################################################################
+
+  namespace eval vtor {
+    proc valIsType { val type } {
+      return [string is $type -strict $val]
+    }
+
+    proc listValIsLen { val minLen maxLen } {
+      set valLen [llength $val]
+      if { $minLen <= 0 } {
+        set minLen $valLen
+      }
+      if { $maxLen <= 0 } {
+        set maxLen $valLen
+      }
+      return [expr {$minLen <= $valLen && $maxLen >= $valLen}]
+    }
+
+    proc valIsTypeArray { val arrType minLen maxLen } {
+      set ret 0
+      if { [listValIsLen $val $minLen $maxLen] } {
+        set ret 1
+        foreach v $val {
+          if { ![pw::Wizard::callValidator $arrType $v] } {
+            set ret 0
+            break
+          }
+        }
+      }
+      return $ret
+    }
+
+    proc numInRange { val minVal maxVal } {
+      set ret 1
+      if { $minVal != {inf} && $val < $minVal } {
+        set ret 0
+      } elseif { $maxVal != {inf} && $val > $maxVal } {
+        set ret 0
+      }
+      return $ret
+    }
+
+    proc int { val args } {
+      lappend args inf inf
+      lassign $args minVal maxVal
+      return [expr {[valIsType $val integer] &&
+        [numInRange $val $minVal $maxVal]}]
+    }
+
+    proc double { val args } {
+      lappend args inf inf
+      lassign $args minVal maxVal
+      return [expr {[valIsType $val double] && \
+        [numInRange $val $minVal $maxVal]}]
+    }
+
+    proc text { val args } {
+      return [valIsType $val alnum]
+    }
+
+    proc arr { val args } {
+      # args: {type ?minLen? ?maxLen?}
+      lappend args 0 0
+      lassign $args arrType minLen maxLen
+      return [pw::Wizard::valIsTypeArray $val $arrType $minLen $maxLen]
+    }
+
+    proc vec3 { val args } {
+      return [valIsTypeArray $val double 3 3]
+    }
+
+    proc int3 { val args } {
+      return [valIsTypeArray $val integer 3 3]
+    }
+
+    proc nop { val args } {
+      return 1
+    }
   }
 
   #####################################################################
@@ -555,8 +572,6 @@ namespace eval pw::Wizard {
   configure -errorBgColor #fee
   configure -errorFgColor #a00
 }
-
-} ;# ![namespace exists pw::Wizard]
 
 # END SCRIPT
 
