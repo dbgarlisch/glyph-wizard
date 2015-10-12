@@ -36,7 +36,7 @@ The following *pw::Wizard* commands are supported.
 * [replaceValidator](#pwwizard-replacevalidator-procname-valtypes)
 * [configure](#pwwizard-configure-option-value-option-value-)
 * [cget](#pwwizard-cget-option)
-* [run](#pwwizard-run)
+* [run](#pwwizard-run-finishcmd-cancel-cancelcmd)
 
 ### **pw::Wizard page add** *name script*
 The **page add** command is used to create a wizard page object.
