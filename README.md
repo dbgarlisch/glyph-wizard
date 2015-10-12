@@ -97,4 +97,4 @@ POINTWISE.
 [WizAPI-page-add]: docs/Wizard_API.md#pwwizard-page-add-name-script
 [WizAPI-wizentry]: docs/Wizard_API.md#wizentry-parentpath-varname-vartypespec-entryopts
 [WizAPI-configure]: docs/Wizard_API.md#pwwizard-configure-option-value-option-value-
-[WizAPI-run]: docs/Wizard_API.md#pwwizard-run
+[WizAPI-run]: docs/Wizard_API.md#pwwizard-run-finishcmd-cancel-cancelcmd
