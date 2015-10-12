@@ -145,7 +145,8 @@ namespace eval wizApp {
       puts [format "%10.10s: %s" $vtor [pw::Wizard getValidator $vtor]]
     }
 
-    if { [pw::Wizard run] } {
+    pw::Wizard run {
+      # This required script is invoked when the Finish button is pressed.
       puts "wizard finished"
       set vars [lsort [info vars ::wizApp::*]]
       foreach var $vars {
@@ -153,6 +154,9 @@ namespace eval wizApp {
           [namespace which -variable $var] \
           [set $var]]
       }
+    } cancel {
+      # This optional script is invoked when the Cancel button is pressed.
+      puts "wizard canceled"
     }
   }
 }

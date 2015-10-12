@@ -126,8 +126,19 @@ proc pw::Wizard::cget { opt } {
 }
 
 
-proc pw::Wizard::run {} {
-  variable nb_
+proc pw::Wizard::run { finishBody args } {
+  variable w
+
+  if { 0 == [llength $args] } {
+    set cancelBody {}
+  } elseif { 2 != [llength $args] } {
+    error "Invalid number of arguments: [list $args]"
+  } elseif { {cancel} != [lindex $args 0] } {
+    error "Missing cancel keyword: [list $args]"
+  } else {
+    # cancelBody code
+    set cancelBody [lindex $args 1]
+  }
 
   initWidgets
   initPages
@@ -137,11 +148,19 @@ proc pw::Wizard::run {} {
   #wm resizable . 0 0
   wm minsize . 600 300
 
-  #$pw::Wizard::nb_ compute_size
-  $nb_ raise [lindex [page_names] 0]
+  #$pw::Wizard::w(nb) compute_size
+  $w(nb) raise [lindex [page_names] 0]
 
-  tkwait window .
-  return [getStatus]
+  tkwait variable pw::Wizard::status_
+  wm withdraw .
+
+  if { [getStatus] } {
+    uplevel 1 $finishBody
+  } else {
+    uplevel 1 $cancelBody
+  }
+
+  exit
 }
 
 
@@ -156,8 +175,16 @@ namespace eval pw::Wizard {
 #                       private namespace procs
 #####################################################################
 namespace eval pw::Wizard {
-  variable status_ 0
-  variable nb_ .nb
+  variable status_ null
+
+  variable w
+  set w(nb)       .nb
+  set w(btnBar)   .btnBar
+    set w(back)     $w(btnBar).back
+    set w(next)     $w(btnBar).next
+    set w(finish)   $w(btnBar).finish
+    set w(cancel)   $w(btnBar).cancel
+
   variable pageDb_ [dict create]
   variable vtorDb_ [dict create]
   variable configDb_ [dict create \
@@ -167,30 +194,23 @@ namespace eval pw::Wizard {
   ]
 
   proc initWidgets {} {
-    variable nb_
+    variable w
+    NoteBook $w(nb) -arcradius 6 -tabbevelsize 6 -tabpady {6 8} -width 800 -height 200
+    frame $w(btnBar) -relief sunken
+    button $w(back)   -text "Back"   -width 10 -bd 2 -command "pw::Wizard::onPrevPage"
+    button $w(next)   -text "Next"   -width 10 -bd 2 -command "pw::Wizard::onNextPage"
+    button $w(finish) -text "Finish" -width 10 -bd 2 -command "pw::Wizard::onFinish"
+    button $w(cancel) -text "Cancel" -width 10 -bd 2 -command "pw::Wizard::onCancel"
 
-    NoteBook $nb_ -arcradius 6 -tabbevelsize 6 -tabpady {6 8} -width 800 \
-      -height 200
-
-    frame .fBtnBar -relief sunken
-    button .fBtnBar.back   -text "Back"   -width 10 -bd 2 \
-      -command "pw::Wizard::onPrevPage"
-    button .fBtnBar.next   -text "Next"   -width 10 -bd 2 \
-      -command "pw::Wizard::onNextPage"
-    button .fBtnBar.finish -text "Finish" -width 10 -bd 2 \
-      -command "pw::Wizard::onFinish"
-    button .fBtnBar.cancel -text "Cancel" -width 10 -bd 2 \
-      -command "pw::Wizard::onCancel"
-
-    pack .nb -fill both -expand true   -pady {6 0}  -padx 10
-    pack .fBtnBar.cancel               -pady 0      -padx {6 0} -side right
-    pack .fBtnBar.finish               -pady 0      -padx {18 0} -side right
-    pack .fBtnBar.next .fBtnBar.back   -pady 0      -padx {6 0} -side right
-    pack .fBtnBar -fill x -side bottom -pady {10 6} -padx 10 -anchor s
+    pack $w(nb) -fill both -expand true  -pady {6 0}  -padx 10
+    pack $w(cancel)                      -pady 0      -padx {6 0} -side right
+    pack $w(finish)                      -pady 0      -padx {18 0} -side right
+    pack $w(next) $w(back)               -pady 0      -padx {6 0} -side right
+    pack $w(btnBar) -fill x -side bottom -pady {10 6} -padx 10 -anchor s
   }
 
   proc initPages { } {
-    variable nb_
+    variable w
     variable pageDb_
     set prevPage {}
     foreach page [page_names] {
@@ -204,11 +224,11 @@ namespace eval pw::Wizard {
       set prevPage $page
 
       # ask notebook for the name of the page's frame widget
-      set pgFrame [$nb_ getframe $page]
+      set pgFrame [$w(nb) getframe $page]
       dict set pageDb_ $page FRAME $pgFrame
 
       # Append a new notebook page
-      $nb_ insert end $page \
+      $w(nb) insert end $page \
         -createcmd "pw::Wizard::onCreate $page $pgFrame" \
         -leavecmd "pw::Wizard::onLeave $page $pgFrame" \
         -raisecmd "pw::Wizard::onEnter $page $pgFrame" \
@@ -220,21 +240,22 @@ namespace eval pw::Wizard {
 
     # in reverse order, force each page to call its onCreate proc
     foreach page [lreverse  [page_names]] {
-      $nb_ raise $page
+      $w(nb) raise $page
     }
   }
 
-  proc checkFinish { {w {}} } {
+  proc checkFinish { {wid {}} } {
+    variable w
     set state disabled
     if { 0 == [getErrCount] } {
-      if { [cgetCallProc -varsCheckProc 1 $w] } {
+      if { [cgetCallProc -varsCheckProc 1 $wid] } {
         set state normal
       }
     } else {
       # Notify app that validation failed - ignore return value
-      cgetCallProc -varsCheckProc 0 $w
+      cgetCallProc -varsCheckProc 0 $wid
     }
-    .fBtnBar.finish configure -state $state
+    $w(finish) configure -state $state
   }
 
   proc callProc { procName args } {
@@ -255,34 +276,32 @@ namespace eval pw::Wizard {
   }
 
   proc onNextPage { } {
-    variable nb_
+    variable w
     variable pageDb_
-    set curPage [$nb_ raise]
+    set curPage [$w(nb) raise]
     set nextPage [dict get $pageDb_ $curPage NEXTPAGE]
     if { {} != $nextPage } {
-      $nb_ raise $nextPage
+      $w(nb) raise $nextPage
     }
   }
 
   proc onPrevPage { } {
-    variable nb_
+    variable w
     variable pageDb_
-    set curPage [$nb_ raise]
+    set curPage [$w(nb) raise]
     set prevPage [dict get $pageDb_ $curPage PREVPAGE]
     if { {} != $prevPage } {
-      $nb_ raise $prevPage
+      $w(nb) raise $prevPage
     }
   }
 
   proc onFinish { } {
     variable status_
-    destroy .
     set status_ 1
   }
 
   proc onCancel { } {
     variable status_
-    destroy .
     set status_ 0
   }
 
@@ -301,20 +320,21 @@ namespace eval pw::Wizard {
   }
 
   proc onEnter { page pgFrame } {
+    variable w
     variable pageDb_
 
     # Call the page's onEnter proc
     ${page}::onEnter $page $pgFrame
 
     if { [lindex [dict keys $pageDb_] 0] == $page } {
-      .fBtnBar.back configure -state disabled
+      $w(back) configure -state disabled
     } else {
-      .fBtnBar.back configure -state normal
+      $w(back) configure -state normal
     }
     if { [lindex [dict keys $pageDb_] end] == $page } {
-      .fBtnBar.next configure -state disabled
+      $w(next) configure -state disabled
     } else {
-      .fBtnBar.next configure -state normal
+      $w(next) configure -state normal
     }
   }
 
@@ -452,13 +472,13 @@ namespace eval pw::Wizard {
         if { {} == $txt } {
           set txt $page
         }
-        $::pw::Wizard::nb_ itemconfigure $page -text "$txt"
+        $::pw::Wizard::w(nb) itemconfigure $page -text "$txt"
       }
 
       namespace export setTabIcon
       proc setTabIcon { tabIcon } {
         set page [namespace tail [namespace current]]
-        $::pw::Wizard::nb_ itemconfigure $page -image $tabIcon
+        $::pw::Wizard::w(nb) itemconfigure $page -image $tabIcon
       }
 
       namespace export setOnEnterCmd

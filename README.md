@@ -59,11 +59,15 @@ Configure the wizard using the [`pw::Wizard configure`][WizAPI-configure] comman
 Run the wizard application using the [`pw::Wizard run`][WizAPI-run] command.
 
 ```Tcl
-  if { [pw::Wizard run] } {
+  pw::Wizard run {
+    # The required finish handler is invoked when the Finish button is pressed
     puts "wizard finished"
     puts "  extDist : '$extDist'"
     puts "  extSteps: '$extSteps'"
     puts "  extDir  : '$extDir'"
+  } cancel {
+    # The optional cancel handler is invoked when the Cancle button is pressed
+    puts "wizard canceled"
   }
 ```
 

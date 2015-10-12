@@ -75,12 +75,13 @@ validation engine. See also [Predefined Validators](#predefined-validators).
 <dl>
   <dt><em>procName</em></dt>
   <dd>The proc called to validate a value. The proc must use a call signature
-  that accepts the value being validated as the first arg and an optional number
-  of additional args: <code>val ?arg ...?</code>.</dd>
+    that accepts the value being validated as the first arg and an optional
+    number of additional args: <code>val ?arg ...?</code>.</dd>
   <dt><em>valTypes</em></dt>
   <dd>The list of type names that use this validator proc. If empty (the
-  default), the value returned by <code>[namespace tail $procName]</code> is used. In the
-  list, <em>@</em> is shorthand for <code>[namespace tail $procName]</code>.</dd>
+    default), the value returned by <code>[namespace tail $procName]</code> is
+    used. In the list, <em>@</em> is shorthand for
+    <code>[namespace tail $procName]</code>.</dd>
   <dt><em>allowReplace</em></dt>
   <dd>If 1, any existing value types are replaced. If 0 (the default), replacing
   an exisiting type name is an error.</dd>
@@ -107,12 +108,13 @@ This proc is equivalent to calling:
 <dl>
   <dt><em>procName</em></dt>
   <dd>The proc called to validate a value. The proc must use a call signature
-  that accepts the value being validated as the first arg and an optional number
-  of additional args: <code>val ?arg ...?</code>.</dd>
+    that accepts the value being validated as the first arg and an optional number
+    of additional args: <code>val ?arg ...?</code>.</dd>
   <dt><em>valTypes</em></dt>
   <dd>The list of type names that use this validator proc. If empty (the
-  default), the value returned by <code>[namespace tail $procName]</code> is used. In the
-  list, <em>@</em> is shorthand for <code>[namespace tail $procName]</code>.</dd>
+    default), the value returned by <code>[namespace tail $procName]</code> is
+    used. In the list, <em>@</em> is shorthand for
+    <code>[namespace tail $procName]</code>.</dd>
 </dl>
 <br/>
 
@@ -169,9 +171,19 @@ value.
 <br/>
 
 
-### **pw::Wizard run**
-The **run** starts the application. Prior to the display of the wizard
+### **pw::Wizard run** *finishCmd ?cancel cancelCmd?*
+The **run** command starts the wizard. Prior to the display of the wizard
 dialog box, each page's *onCreate* proc is executed.
+<dl>
+  <dt><em>finishCmd</em></dt>
+  <dd>Defines the script executed if the user presses the dialog's Finish
+  button. The framework calls exit after this script finishes.</dd>
+  <dt><em>cancel</em></dt>
+  <dd>Command keyword. Required if a cancelCmd is specified.</dd>
+  <dt><em>cancelCmd</em></dt>
+  <dd>Defines the script executed if the user presses the dialog's Cancel
+  button. The framework calls exit after this script finishes.</dd>
+</dl>
 <br/>
 
 
